@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
- mock-global-gs1-resolver:
+  mock-global-gs1-resolver:
     build:
       context: .
       dockerfile: Dockerfile
