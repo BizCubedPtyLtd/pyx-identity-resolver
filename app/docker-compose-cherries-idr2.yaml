@@ -1,0 +1,44 @@
+version: '3.7'
+
+services:
+  identity-resolver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3001:3000'
+    environment:
+      - MINIO_ENDPOINT=mock-global-gs1-resolver-object-store
+      - MINIO_PORT=9000
+      - MINIO_USE_SSL=false
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_BUCKET_NAME=idr-bucket-2
+      - IDENTIFIER_PATH=identifiers
+      - API_KEY=test456
+      - APP_ENDPOINT=https://cherries-api.datatrust.link:3001
+      - APP_NAME=IDR-2
+      - RESOLVER_DOMAIN=https://cherries-api.datatrust.link:3001
+      - LINK_TYPE_VOC_DOMAIN=https://cherries-api.datatrust.link:3001/voc
+    depends_on:
+      - minio
+
+  minio:
+    hostname: minio
+    image: quay.io/minio/minio:RELEASE.2024-08-17T01-24-54Z-cpuv1
+    command: server /data --console-address ":9091"
+    ports:
+      - '9001:9000'
+      - '9091:9090'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+
+    volumes:
+      - ${MINIO_DATA_DIR:-./minio_data}:/data
