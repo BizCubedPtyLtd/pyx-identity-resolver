@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  identity-resolver:
+  identity-resolver-service:
     build:
       context: .
       dockerfile: Dockerfile
@@ -21,9 +21,9 @@ services:
       - RESOLVER_DOMAIN=https://cherries-api.datatrust.link:3000
       - LINK_TYPE_VOC_DOMAIN=https://cherries-api.datatrust.link:3000/voc
     depends_on:
-      - minio
+      - identity-resolver-service-object-store
 
-  minio:
+  identity-resolver-service-object-store:
     hostname: minio
     image: quay.io/minio/minio:RELEASE.2024-08-17T01-24-54Z-cpuv1
     command: server /data --console-address ":9090"
@@ -41,4 +41,4 @@ services:
       - MINIO_ROOT_PASSWORD=minioadmin
 
     volumes:
-      - ${MINIO_DATA_DIR:-./minio_data}:/data
+      - ${MINIO_DATA_DIR:-./minio_data/identity-resolver-service-object-store}:/data
